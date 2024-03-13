@@ -11,10 +11,10 @@
 
 ## Tech Stack | Tools
 
-- React.js
-- Express.js
-- Node.js
 - MongoDB
+- Express.js
+- React.js
+- Node.js
 - TailwindCSS
 - Insomnia
 - Figma
