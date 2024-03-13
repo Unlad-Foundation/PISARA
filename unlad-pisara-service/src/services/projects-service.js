@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const Project = require("../../models/admin/projects-model");
+const Project = require("../models/admin/projects-model");
 
 //*Get all Projects, access private
 const getProjects = asyncHandler(async (req, res) => {

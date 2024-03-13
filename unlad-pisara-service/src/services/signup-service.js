@@ -1,9 +1,9 @@
 const asyncHandler = require("express-async-handler");
-const User = require("../../models/users/user-model");
+const User = require("../models/users/user-model");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 
-//*Get the user
+//*Get the user by id
 const getUser = asyncHandler(async (req, res) => {
   try {
     const user = await User.findById(req.params.id);

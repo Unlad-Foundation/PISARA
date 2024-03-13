@@ -3,7 +3,7 @@ const { createProject, getProjects, updateProject, deleteProject } = require("..
 
 const router = express.Router();
 
-router.use(require("../../middleware/validate-token-handler"));
+router.use(require("../middleware/validate-token-handler"));
 router.route("/project").get(getProjects);
 router.route("/project").post(createProject);
 router.route("/project/:id").put(updateProject).delete(deleteProject);

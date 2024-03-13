@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const User = require("../../models/users/user-model");
+const User = require("../models/users/user-model");
 
 //*Get users. For debugging only
 const getUsers = asyncHandler(async (req, res) => {
