@@ -9,12 +9,10 @@
 - Joshua Flores
 - Dariel Avila
 
-## Tech Stack | Tools
+## Tech Stack
 
 - MongoDB
 - Express.js
 - React.js
 - Node.js
 - TailwindCSS
-- Insomnia
-- Figma
