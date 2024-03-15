@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
-const Project = require("../models/admin/projects-model");
+const Project = require("../models/projects-model");
+const { trimAll } = require("../config/common-config")
 
 //*Get all Projects, access private
 const getProjects = asyncHandler(async (req, res) => {
@@ -14,24 +15,24 @@ const getProjects = asyncHandler(async (req, res) => {
 
 //*Create Project, access private
 const createProject = asyncHandler(async (req, res) => {
-  const { project_name, description, start_date, end_date, stages = [], tasks = [] } =
-    req.body;
+  const trimmedBody = trimAll(req.body);
+  const { project_name, description, start_date, end_date, stages = [], tasks = [] } = trimmedBody;
 
   try {
-    if (!project_name.trim() || !description.trim() || !start_date.trim() || !end_date.trim()) {
+    if (!project_name || !description || !start_date || !end_date) {
       throw new Error("Please provide all required project details.");
     }
 
-    const projectAvailable = await Project.findOne({ project_name: project_name.trim() });
+    const projectAvailable = await Project.findOne({ project_name });
     if (projectAvailable) {
       throw new Error("Project with that name already exists!");
     }
 
     const project = await Project.create({
-      project_name: project_name.trim(),
-      description: description.trim(),
-      start_date: start_date.trim(),
-      end_date: end_date.trim(),
+      project_name,
+      description,
+      start_date,
+      end_date,
       stages,
       tasks,
       user_id: req.user.id,
@@ -46,18 +47,19 @@ const createProject = asyncHandler(async (req, res) => {
 
 //*Update a Project, access private
 const updateProject = asyncHandler(async (req, res) => {
-  const { project_name, description, start_date, end_date, stages = [], tasks = [] } = req.body;
+  const trimmedBody = trimAll(req.body);
+  const { project_name, description, start_date, end_date, stages = [], tasks = [] } = trimmedBody;
 
   try {
-    if (!project_name.trim() || !description.trim() || !start_date.trim() || !end_date.trim()) {
+    if (!project_name || !description || !start_date || !end_date) {
       throw new Error("Please provide all required project details.");
     }
 
     const updatedProject = await Project.findByIdAndUpdate(req.params.id, {
-      project_name: project_name.trim(),
-      description: description.trim(),
-      start_date: start_date.trim(),
-      end_date: end_date.trim(),
+      project_name,
+      description,
+      start_date,
+      end_date,
       stages,
       tasks,
     }, {

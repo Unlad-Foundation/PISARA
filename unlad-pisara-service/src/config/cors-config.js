@@ -1,7 +1,8 @@
 const cors = require("cors");
+const { origin } = require("./constants-config")
 
 const corsOptions = {
-  origin: ["http://localhost:5173"],
+  origin: [origin.ORIGIN],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true,
 };

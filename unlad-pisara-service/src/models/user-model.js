@@ -10,9 +10,9 @@ const userSchema = mongoose.Schema(
       type: String,
       required: [true, "Last name is required"],
     },
-    position: {
+    role: {
       type: String,
-      required: [true, "Position is required"],
+      required: [true, "Role is required"],
     },
     email: {
       type: String,

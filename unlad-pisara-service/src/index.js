@@ -15,8 +15,7 @@ app.use(express.json());
 app.use(require("./config/cors-config.js"));
 app.use(require("./config/session-config.js"));
 
-app.use("/api", require("./routes/signup-route.js"));
-app.use("/api", require("./routes/signin-route.js"));
+app.use("/api", require("./routes/user-route.js"));
 app.use("/api", require("./routes/projects-route.js"));
 
 app.use(require("./middleware/error-handler.js"));

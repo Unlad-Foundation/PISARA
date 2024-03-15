@@ -1,7 +1,6 @@
 const express = require("express");
-const { createProject, getProjects, updateProject, deleteProject } = require("../../controllers/admin/projects-controller");
-
 const router = express.Router();
+const { createProject, getProjects, updateProject, deleteProject } = require("../services/projects-service");
 
 router.use(require("../middleware/validate-token-handler"));
 router.route("/project").get(getProjects);
