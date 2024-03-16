@@ -17,6 +17,7 @@ app.use(require("./config/session-config.js"));
 
 app.use("/api", require("./routes/user-route.js"));
 app.use("/api", require("./routes/projects-route.js"));
+app.use("/api", require("./routes/project-member-route.js"));
 
 app.use(require("./middleware/error-handler.js"));
 

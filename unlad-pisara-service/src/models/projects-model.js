@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const stageSchema = require("./stage-model")
 const taskSchema = require("./tasks-model")
+const ProjectMember = require("./project-member-model")
 
 const projectSchema = new mongoose.Schema({
   user_id: {
@@ -10,10 +11,18 @@ const projectSchema = new mongoose.Schema({
   },
   project_name: { type: String, required: true },
   description: { type: String },
+  members: { type: [mongoose.Schema.Types.ObjectId], ref: "ProjectMember" },
   start_date: { type: Date, required: true },
   end_date: { type: Date },
   stages: { type: [stageSchema], required: false },
   tasks: { type: [taskSchema], required: false },
 });
+
+projectSchema.methods.addMember = async function(userId){
+  const member = await ProjectMember.create({ project_id: this._id, user_id: userId });
+  this.members.push(member._id);
+  await this.save();
+  return this.populate('members');
+}
 
 module.exports = mongoose.model("Project", projectSchema);
