@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const ProjectMember = require("../models/project-member-model");
 
+//* Get project members, access private
 const getProjectMembers = asyncHandler(async (req, res) => {
     const { project_id } = req.params;
     try {
@@ -12,6 +13,7 @@ const getProjectMembers = asyncHandler(async (req, res) => {
     }
 });
 
+//* Deactivate a member, access private
 const deactivateMember = asyncHandler(async (req, res) => {
     const { project_id, user_id } = req.body;
     try {
@@ -28,6 +30,7 @@ const deactivateMember = asyncHandler(async (req, res) => {
     }
 })
 
+//* Activate a member, access private
 const activateMember = asyncHandler(async (req, res) => {
     const { project_id, user_id } = req.body;
     try {

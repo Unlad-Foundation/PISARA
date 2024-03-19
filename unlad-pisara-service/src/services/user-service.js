@@ -128,7 +128,7 @@ const loginUser = asyncHandler(async (req, res) => {
         }
 
         const accessToken = jwt.sign(
-            { user: { id: user.id, email: user.email } },
+            { user: { id: user.id, email: user.email, role: user.role } },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: "1d" }
         );

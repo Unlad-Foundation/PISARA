@@ -55,15 +55,16 @@ const createProject = asyncHandler(async (req, res) => {
   }
 });
 
+//*Add a member in Project, access private
 const addMemberToProject = asyncHandler(async (req, res) => {
-  const { projectId, userId } = req.body;
+  const { project_id, user_id } = req.body;
   try {
-    const project = await Project.findById(projectId);
+    const project = await Project.findById(project_id);
     if (!project) {
       res.status(404).json({ message: "Project not found" });
       return;
     }
-    await project.addMember(userId);
+    await project.addMember(user_id);
     res.status(200).json({ message: "Member added successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
