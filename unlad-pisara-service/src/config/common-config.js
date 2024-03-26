@@ -6,4 +6,8 @@ function trimAll(obj) {
     return trimmedObj;
 }
 
-module.exports = { trimAll };
+const MSG = {
+    WELCOME: "You're successfully connected to Template API.",
+}
+
+module.exports = { trimAll, MSG };

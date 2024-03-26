@@ -1,5 +1,8 @@
 module.exports = {
     API_ENDPOINTS: {
+        MAIN: {
+            DEFAULT: "/",
+        },
         // user endpoints
         USER_REGISTER: {
             GET: "/users",
