@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const validateToken = require("../middleware/validate-token-handler");
 const { deactivateMember, activateMember, getProjectMembers } = require("../services/project-member-service");
 const { API_ENDPOINTS } = require("../config/endpoints-config");
 
-router.route(API_ENDPOINTS.PROJECT_MEMBER.GET).get(validateToken, getProjectMembers);
-// router.route("").post(deactivateMember);
-// router.route("").post(activateMember);
+router.use(require("../middleware/validate-token-handler"))
+router.route(API_ENDPOINTS.PROJECT_MEMBER.GET).get(getProjectMembers);
+router.route(API_ENDPOINTS.PROJECT_MEMBER.DEACTIVATE).put(deactivateMember);
+router.route(API_ENDPOINTS.PROJECT_MEMBER.ACTIVATE).put(activateMember);
 
 module.exports = router;

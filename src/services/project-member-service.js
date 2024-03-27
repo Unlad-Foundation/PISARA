@@ -15,15 +15,13 @@ const getProjectMembers = asyncHandler(async (req, res) => {
 
 //* Deactivate a member, access private
 const deactivateMember = asyncHandler(async (req, res) => {
-    const { project_id, user_id } = req.body;
+    const { project_id, user_id } = req.params;
     try {
-        const member = await ProjectMember.findOne({ project_id, user_id });
+        const member = await ProjectMember.findOneAndUpdate({ project_id, user_id }, { $set: { is_active: false } }, { new: true });
         if (!member) {
             throw new Error("Member not found");
         }
-        member.is_active = false;
-        await member.save();
-        res.status(200).json(member);
+        res.status(200).json({ message: `Member deactivated ${member}` });
     } catch (error) {
         res.status(404);
         throw error;
@@ -32,15 +30,13 @@ const deactivateMember = asyncHandler(async (req, res) => {
 
 //* Activate a member, access private
 const activateMember = asyncHandler(async (req, res) => {
-    const { project_id, user_id } = req.body;
+    const { project_id, user_id } = req.params;
     try {
-        const member = await ProjectMember.findOne({ project_id, user_id });
+        const member = await ProjectMember.findOneAndUpdate({ project_id, user_id }, { $set: { is_active: true } }, { new: true });
         if (!member) {
             throw new Error("Member not found");
         }
-        member.is_active = true;
-        await member.save();
-        res.status(200).json(member);
+        res.status(200).json({ message: `Member activated ${member}` });
     } catch (error) {
         res.status(404);
         throw error;
