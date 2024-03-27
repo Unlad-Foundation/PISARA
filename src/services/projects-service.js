@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Project = require("../models/projects-model");
 const ProjectMember = require("../models/project-member-model");
-const { trimAll } = require("../config/common-config")
+const { trimAll } = require("../config/common-config");
 
 //*Get all Projects, access private
 const getProjects = asyncHandler(async (req, res) => {
@@ -17,7 +17,15 @@ const getProjects = asyncHandler(async (req, res) => {
 //*Create Project, access private
 const createProject = asyncHandler(async (req, res) => {
   const trimmedBody = trimAll(req.body);
-  const { project_name, description, start_date, end_date, stages = [], tasks = [], members = [] } = trimmedBody;
+  const {
+    project_name,
+    description,
+    start_date,
+    end_date,
+    stages = [],
+    tasks = [],
+    members = [],
+  } = trimmedBody;
 
   try {
     if (!project_name || !description || !start_date || !end_date || !members) {
@@ -40,10 +48,15 @@ const createProject = asyncHandler(async (req, res) => {
     });
 
     // add members to the project
-    const memberIds = await Promise.all(members.map(async (userId) => {
-      const member = await ProjectMember.create({ project_id: project._id, user_id: userId });
-      return member._id;
-    }));
+    const memberIds = await Promise.all(
+      members.map(async (userId) => {
+        const member = await ProjectMember.create({
+          project_id: project._id,
+          user_id: userId,
+        });
+        return member._id;
+      })
+    );
 
     project.members = memberIds;
     await project.save();
@@ -57,13 +70,21 @@ const createProject = asyncHandler(async (req, res) => {
 
 //*Add a member in Project, access private
 const addMemberToProject = asyncHandler(async (req, res) => {
-  const { project_id, user_id } = req.body;
+  const { user_id } = req.body;
+  const { project_id } = req.params;
   try {
-    const project = await Project.findById(project_id);
+    const project = await Project.findOne({ _id: project_id }).populate('members');
     if (!project) {
       res.status(404).json({ message: "Project not found" });
       return;
     }
+
+    const isAlreadyMember = project.members.some(member => member.user_id.equals(user_id));
+    if (isAlreadyMember) {
+      res.status(400).json({ message: "User is already a member of this project." });
+      return;
+    }
+
     await project.addMember(user_id);
     res.status(200).json({ message: "Member added successfully" });
   } catch (error) {
@@ -74,33 +95,44 @@ const addMemberToProject = asyncHandler(async (req, res) => {
 //*Update a Project, access private
 const updateProject = asyncHandler(async (req, res) => {
   const trimmedBody = trimAll(req.body);
-  const { project_name, description, start_date, end_date, stages = [], tasks = [] } = trimmedBody;
+  const {
+    project_name,
+    description,
+    start_date,
+    end_date,
+    stages = [],
+    tasks = [],
+  } = trimmedBody;
 
   try {
     if (!project_name || !description || !start_date || !end_date) {
       throw new Error("Please provide all required project details.");
     }
 
-    const updatedProject = await Project.findByIdAndUpdate(req.params.id, {
-      project_name,
-      description,
-      start_date,
-      end_date,
-      stages,
-      tasks,
-    }, {
-      new: true,
-    })
+    const updatedProject = await Project.findByIdAndUpdate(
+      req.params.id,
+      {
+        project_name,
+        description,
+        start_date,
+        end_date,
+        stages,
+        tasks,
+      },
+      {
+        new: true,
+      }
+    );
 
     if (!updatedProject) {
       throw new Error("Project not found");
     }
-    res.status(200).json({ message: "Project updated successfully" });;
+    res.status(200).json({ message: "Project updated successfully" });
   } catch (error) {
     res.status(404);
     throw error;
   }
-})
+});
 
 //*Delete a Project, access private
 const deleteProject = asyncHandler(async (req, res) => {
@@ -114,6 +146,12 @@ const deleteProject = asyncHandler(async (req, res) => {
     res.status(400);
     throw error;
   }
-})
+});
 
-module.exports = { getProjects, createProject, updateProject, deleteProject, addMemberToProject };
+module.exports = {
+  getProjects,
+  createProject,
+  updateProject,
+  deleteProject,
+  addMemberToProject
+};

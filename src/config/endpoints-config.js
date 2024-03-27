@@ -18,11 +18,11 @@ module.exports = {
             GET: "/projects",
             POST: "/projects",
             GET_UPDATE_DELETE_BY_ID: "/projects/:id",
-            ADD_MEMBER: "/projects/:project_id/member"
         },
         // project members endpoints
         PROJECT_MEMBER: {
             GET: "/:project_id",
+            ADD_MEMBER: "/projects/:project_id/member"
         }
     }
 }

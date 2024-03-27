@@ -11,18 +11,26 @@ const projectSchema = new mongoose.Schema({
   },
   project_name: { type: String, required: true },
   description: { type: String },
-  members: { type: [mongoose.Schema.Types.ObjectId], ref: "ProjectMember" },
+  members: [{ type: mongoose.Schema.Types.ObjectId, ref: "ProjectMember" }],
   start_date: { type: Date, required: true },
   end_date: { type: Date },
   stages: { type: [stageSchema], required: false },
   tasks: { type: [taskSchema], required: false },
 });
 
-projectSchema.methods.addMember = async function(userId){
+projectSchema.methods.addMember = async function(userId) {
+  const isAlreadyMember = this.members.some(member => member.equals(userId));
+  if (isAlreadyMember) {
+    throw new Error("User is already a member of this project.");
+  }
+
   const member = await ProjectMember.create({ project_id: this._id, user_id: userId });
   this.members.push(member._id);
   await this.save();
-  return this.populate('members');
-}
+  return this.populate({
+    path: 'members',
+    populate: { path: 'user_id', model: 'User' }
+  });
+};
 
 module.exports = mongoose.model("Project", projectSchema);
