@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { deactivateMember, activateMember, getProjectMembers } = require("../services/project-member-service");
+const { deactivateMember, activateMember, getProjectMembers } = require("../services/members-service");
 const { API_ENDPOINTS } = require("../config/endpoints-config");
 
 router.use(require("../middleware/validate-token-handler"))

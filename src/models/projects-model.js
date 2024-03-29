@@ -1,36 +1,50 @@
 const mongoose = require("mongoose");
-const stageSchema = require("./stage-model")
-const taskSchema = require("./tasks-model")
-const ProjectMember = require("./project-member-model")
+const stageSchema = require("./stage-model");
+const taskSchema = require("./tasks-model");
 
-const projectSchema = new mongoose.Schema({
-  user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+const projectSchema = new mongoose.Schema(
+  {
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    project_name: { type: String, required: true },
+    description: { type: String },
+    members: [
+      {
+        user_id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        is_active: { type: Boolean, default: true },
+      },
+    ],
+    start_date: { type: Date, required: true },
+    end_date: { type: Date },
+    stages: { type: [stageSchema], required: false },
+    tasks: { type: [taskSchema], required: false },
   },
-  project_name: { type: String, required: true },
-  description: { type: String },
-  members: [{ type: mongoose.Schema.Types.ObjectId, ref: "ProjectMember" }],
-  start_date: { type: Date, required: true },
-  end_date: { type: Date },
-  stages: { type: [stageSchema], required: false },
-  tasks: { type: [taskSchema], required: false },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
+
+projectSchema.virtual("membersCount").get(function () {
+  return this.members.length;
 });
 
-projectSchema.methods.addMember = async function(userId) {
-  const isAlreadyMember = this.members.some(member => member.equals(userId));
-  if (isAlreadyMember) {
-    throw new Error("User is already a member of this project.");
+projectSchema.methods.addMember = async function (userId) {
+  const isMemberAlready = this.members.some((member) =>
+    member.user_id.equals(userId)
+  );
+  if (isMemberAlready) {
+    throw new Error("Member already exists in the project");
   }
-
-  const member = await ProjectMember.create({ project_id: this._id, user_id: userId });
-  this.members.push(member._id);
+  this.members.push({ user_id: userId, is_active: true });
   await this.save();
-  return this.populate({
-    path: 'members',
-    populate: { path: 'user_id', model: 'User' }
-  });
 };
 
 module.exports = mongoose.model("Project", projectSchema);

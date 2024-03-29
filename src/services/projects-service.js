@@ -1,12 +1,18 @@
 const asyncHandler = require("express-async-handler");
 const Project = require("../models/projects-model");
-const ProjectMember = require("../models/project-member-model");
 const { trimAll } = require("../config/common-config");
 
 //*Get all Projects, access private
 const getProjects = asyncHandler(async (req, res) => {
   try {
-    const projects = await Project.find({ user_id: req.user.id });
+    const projects = await Project.find({ createdBy: req.user.id }).populate({
+      path: "members.user_id",
+      select: "firstname lastname email role",
+    })
+      .populate({
+        path: "createdBy",
+        select: "firstname lastname role",
+      })
     res.status(200).json(projects);
   } catch (error) {
     res.status(404);
@@ -28,7 +34,7 @@ const createProject = asyncHandler(async (req, res) => {
   } = trimmedBody;
 
   try {
-    if (!project_name || !description || !start_date || !end_date || !members) {
+    if (!project_name || !description || !start_date || !end_date) {
       throw new Error("Please provide all required project details.");
     }
 
@@ -44,22 +50,9 @@ const createProject = asyncHandler(async (req, res) => {
       end_date,
       stages,
       tasks,
-      user_id: req.user.id,
+      createdBy: req.user.id,
+      members: members.map((userId) => ({ user_id: userId, is_active: true })),
     });
-
-    // add members to the project
-    const memberIds = await Promise.all(
-      members.map(async (userId) => {
-        const member = await ProjectMember.create({
-          project_id: project._id,
-          user_id: userId,
-        });
-        return member._id;
-      })
-    );
-
-    project.members = memberIds;
-    await project.save();
 
     res.status(201).json(project);
   } catch (error) {
@@ -73,22 +66,24 @@ const addMemberToProject = asyncHandler(async (req, res) => {
   const { user_id } = req.body;
   const { project_id } = req.params;
   try {
-    const project = await Project.findOne({ _id: project_id }).populate('members');
+    let project = await Project.findById(project_id);
     if (!project) {
       res.status(404).json({ message: "Project not found" });
       return;
     }
 
-    const isAlreadyMember = project.members.some(member => member.user_id.equals(user_id));
-    if (isAlreadyMember) {
-      res.status(400).json({ message: "User is already a member of this project." });
-      return;
-    }
-
     await project.addMember(user_id);
-    res.status(200).json({ message: "Member added successfully" });
+    project = await Project.findById(project_id).populate({
+      path: "members.user_id",
+      select: "firstname lastname email role",
+    });
+    res.status(200).json(project);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    if (error.message === "Member already exists in the project") {
+      res.status(400).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
   }
 });
 
@@ -105,10 +100,6 @@ const updateProject = asyncHandler(async (req, res) => {
   } = trimmedBody;
 
   try {
-    if (!project_name || !description || !start_date || !end_date) {
-      throw new Error("Please provide all required project details.");
-    }
-
     const updatedProject = await Project.findByIdAndUpdate(
       req.params.id,
       {
@@ -122,12 +113,15 @@ const updateProject = asyncHandler(async (req, res) => {
       {
         new: true,
       }
-    );
+    ).populate({
+      path: "members.user_id",
+      select: "firstname lastname email role",
+    });
 
     if (!updatedProject) {
       throw new Error("Project not found");
     }
-    res.status(200).json({ message: "Project updated successfully" });
+    res.status(200).json(updatedProject);
   } catch (error) {
     res.status(404);
     throw error;
@@ -153,5 +147,5 @@ module.exports = {
   createProject,
   updateProject,
   deleteProject,
-  addMemberToProject
+  addMemberToProject,
 };
