@@ -9,10 +9,8 @@ const getProjectMembers = asyncHandler(async (req, res) => {
             path: "members.user_id",
             select: "firstname lastname email role",
         });
-        if (!project) {
-            res.status(404).json({ message: "Project not found" });
-            return;
-        }
+        if (!project) return res.status(404).json({ message: "Project not found" });
+
         res.status(200).json(project.members);
     } catch (error) {
         res.status(404);
@@ -25,16 +23,12 @@ const deactivateMember = asyncHandler(async (req, res) => {
     const { project_id, user_id } = req.params;
     try {
         const project = await Project.findById(project_id);
-        if (!project) {
-            res.status(404).json({ message: "Project not found" });
-            return;
-        }
-        const memberIndex = project.members.findIndex(member => member.user_id.equals(user_id));
-        if (memberIndex === -1) {
-            res.status(404).json({ message: "Member not found" });
-            return;
-        }
-        project.members[memberIndex].is_active = false;
+        if (!project) return res.status(404).json({ message: "Project not found" });
+
+        const member = project.members.find(member => member.user_id.equals(user_id));
+        if (!member) return res.status(404).json({ message: "Member not found" });
+
+        member.is_active = false;
         await project.save();
         res.status(200).json({ message: "Member deactivated" });
     } catch (error) {
@@ -48,16 +42,12 @@ const activateMember = asyncHandler(async (req, res) => {
     const { project_id, user_id } = req.params;
     try {
         const project = await Project.findById(project_id);
-        if (!project) {
-            res.status(404).json({ message: "Project not found" });
-            return;
-        }
-        const memberIndex = project.members.findIndex(member => member.user_id.equals(user_id));
-        if (memberIndex === -1) {
-            res.status(404).json({ message: "Member not found" });
-            return;
-        }
-        project.members[memberIndex].is_active = true;
+        if (!project) return res.status(404).json({ message: "Project not found" });
+
+        const member = project.members.find(member => member.user_id.equals(user_id));
+        if (!member) return res.status(404).json({ message: "Member not found" });
+
+        member.is_active = true;
         await project.save();
         res.status(200).json({ message: "Member activated" });
     } catch (error) {
