@@ -20,7 +20,8 @@ app.use(require("./config/session-config.js"));
 app.get(API_ENDPOINTS.MAIN.DEFAULT, (req, res) => res.send(MSG.WELCOME));
 app.use("/api", require("./routes/user-route.js"));
 app.use("/api", require("./routes/projects-route.js"));
-app.use("/api", require("./routes/project-member-route.js"));
+app.use("/api", require("./routes/member-route.js"));
+app.use("/api", require("./routes/stage-route.js"));
 
 app.use(require("./middleware/error-handler.js"));
 
