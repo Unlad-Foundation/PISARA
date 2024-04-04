@@ -26,7 +26,7 @@ module.exports = {
   },
 
   MEMBER: {
-    GET: "member/get/all",
+    GET: "/member/get/all",
     GET_BY_ID: "/member/:projectId",
     POST: "/member/adduser/:projectId",
     PUT_DEACTIVATE: "/member/deactivate/:projectId/:userId",
