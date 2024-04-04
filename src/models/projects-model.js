@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const stageSchema = require("../models/stage-model").schema;
 
 const projectSchema = new mongoose.Schema(
   {
@@ -22,7 +21,6 @@ const projectSchema = new mongoose.Schema(
     ],
     start_date: { type: Date, required: true },
     end_date: { type: Date },
-    stages: [stageSchema],
   },
   {
     toJSON: { virtuals: true },
