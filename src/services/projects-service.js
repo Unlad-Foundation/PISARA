@@ -5,14 +5,15 @@ const { trimAll } = require("../config/common-config");
 //*Get all Projects, access private
 const getProjects = asyncHandler(async (req, res) => {
   try {
-    const projects = await Project.find({ createdBy: req.user.id }).populate({
-      path: "members.user_id",
-      select: "firstname lastname email role",
-    })
+    const projects = await Project.find({ createdBy: req.user.id })
+      .populate({
+        path: "members.user_id",
+        select: "firstname lastname email role",
+      })
       .populate({
         path: "createdBy",
         select: "firstname lastname role",
-      })
+      });
     res.status(200).json(projects);
   } catch (error) {
     res.status(404);
@@ -28,8 +29,6 @@ const createProject = asyncHandler(async (req, res) => {
     description,
     start_date,
     end_date,
-    stages = [],
-    tasks = [],
     members = [],
   } = trimmedBody;
 
@@ -48,8 +47,6 @@ const createProject = asyncHandler(async (req, res) => {
       description,
       start_date,
       end_date,
-      stages,
-      tasks,
       createdBy: req.user.id,
       members: members.map((userId) => ({ user_id: userId, is_active: true })),
     });
@@ -90,14 +87,7 @@ const addMemberToProject = asyncHandler(async (req, res) => {
 //*Update a Project, access private
 const updateProject = asyncHandler(async (req, res) => {
   const trimmedBody = trimAll(req.body);
-  const {
-    project_name,
-    description,
-    start_date,
-    end_date,
-    stages = [],
-    tasks = [],
-  } = trimmedBody;
+  const { project_name, description, start_date, end_date } = trimmedBody;
 
   try {
     const updatedProject = await Project.findByIdAndUpdate(
@@ -107,8 +97,6 @@ const updateProject = asyncHandler(async (req, res) => {
         description,
         start_date,
         end_date,
-        stages,
-        tasks,
       },
       {
         new: true,
