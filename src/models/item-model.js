@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 
 const itemSchema = new mongoose({
-  createdBy: {
+  owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-  project_id: {
+  projectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Project",
     required: true,
@@ -27,11 +27,7 @@ const itemSchema = new mongoose({
     type: String,
     default: "normal",
   },
-  issue: {
-    type: String,
-    default: "default",
-  },
-  tags: String,
+  tags: [String],
   attachments: {
     type: String,
     link: String,
