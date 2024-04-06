@@ -36,6 +36,7 @@ const projectSchema = new mongoose.Schema(
         isActive: { type: Boolean, default: true },
       },
     ],
+    sprints: [{ type: mongoose.Schema.Types.ObjectId, ref: "Sprint" }],
     projectCounter: {
       type: Number,
       default: 1,

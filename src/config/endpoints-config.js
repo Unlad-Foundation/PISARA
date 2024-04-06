@@ -23,7 +23,7 @@ module.exports = {
       GET_BY_ID: "/project/get/:id",
       POST: "/project/create",
       PUT: "/project/update",
-      DELETE: "/project/delete/:id",
+      DELETE: "/project/remove/:id",
     },
 
     MEMBER: {
@@ -34,7 +34,13 @@ module.exports = {
       PUT_ACTIVATE: "/member/activate",
     },
 
-    SPRINT: {},
+    SPRINT: {
+      GET: "/sprint/get/all",
+      GET_BY_ID: "/sprint/get/:id",
+      POST: "/sprint/create",
+      PUT: "/sprint/update",
+      DELETE: "/sprint/remove/:id",
+    },
 
     ITEM: {
       GET: "/item/get/all",
