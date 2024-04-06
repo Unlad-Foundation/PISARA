@@ -27,6 +27,10 @@ const itemSchema = new mongoose({
     type: String,
     default: "normal",
   },
+  type: {
+    type: String,
+    default: "task",
+  },
   tags: [String],
   attachments: {
     type: String,

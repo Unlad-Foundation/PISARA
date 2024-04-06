@@ -1,7 +1,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const connectDb = require("./config/db-connection-config.js");
-const { API_ENDPOINTS } = require("../src/config/endpoints-config.js");
+const { API_ENDPOINTS } = require("./config/endpoints-config.js");
 const { MSG } = require("../src/config/common-config.js");
 require("dotenv").config();
 

@@ -24,8 +24,8 @@ const getUser = asyncHandler(async (req, res) => {
 const registerUser = asyncHandler(async (req, res) => {
   const trimmedBody = trimAll(req.body);
   try {
-    const { firstname, lastname, role, email, password } = trimmedBody;
-    if (!firstname || !lastname || !role || !email || !password) {
+    const { email, password } = trimmedBody;
+    if (!email || !password) {
       throw new Error("All fields are mandatory!");
     }
 
@@ -42,9 +42,6 @@ const registerUser = asyncHandler(async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltFactor);
 
     let user = await User.create({
-      firstname,
-      lastname,
-      role,
       email,
       password: hashedPassword,
     });
@@ -58,44 +55,37 @@ const registerUser = asyncHandler(async (req, res) => {
 
 //*Update the user, access public
 const updateUser = asyncHandler(async (req, res) => {
-  const trimmedBody = trimAll(req.body);
+  const { email, password } = trimAll(req.body);
+  const userId = req.user.id;
+
   try {
-    const { email, password, ...otherUpdates } = trimmedBody;
-
-    if (email && !validator.isEmail(email)) {
-      res.status(400);
-      throw new Error("Invalid email format");
-    }
-
-    let updates = { ...otherUpdates };
+    const updateData = {};
     if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      updates.password = hashedPassword;
+      updateData.password = await bcrypt.hash(password, saltFactor);
     }
 
-    if (email) updates.email = email;
+    if (email) {
+      updateData.email = email;
+    }
 
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, updates, {
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
       new: true,
     });
 
     if (!updatedUser) {
-      res.status(400);
-      throw new Error("User not found");
+      res.status(400).json({ message: "User not found" });
+      return;
     }
 
-    const { password: _, ...userWithoutPassword } = updatedUser.toObject();
-
-    res
-      .status(200)
-      .json({ message: "Update successful", user: userWithoutPassword });
+    res.status(200).json({
+      message: "Update successful",
+      user: { id: updatedUser.id, email: updatedUser.email },
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "An error occurred during the update.",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "An error occurred during the update.",
+      error: error.message,
+    });
   }
 });
 
@@ -135,7 +125,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     const accessToken = jwt.sign(
-      { user: { id: user.id, email: user.email, role: user.role } },
+      { user: { id: user.id, email: user.email } },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "1d" }
     );

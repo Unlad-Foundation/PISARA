@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const projectSchema = new mongoose.Schema(
   {
@@ -7,26 +8,47 @@ const projectSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    project_name: { type: String, required: true },
+    projectName: { type: String, required: true },
     description: { type: String },
+    status: {
+      type: String,
+      default: "draft",
+    },
+    type: {
+      type: String,
+      default: "ext",
+    },
+    tags: [String],
+    services: [String],
+    startDate: Date,
+    endDate: Date,
+    image: {
+      type: String,
+      default: "https://pisara-mockup.vercel.app/assets/Logo-DBBuCobH.png",
+    },
     members: [
       {
-        user_id: {
+        userId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "User",
           required: true,
         },
-        is_active: { type: Boolean, default: true },
+        isActive: { type: Boolean, default: true },
       },
     ],
-    start_date: { type: Date, required: true },
-    end_date: { type: Date },
+    projectCounter: {
+      type: Number,
+      default: 1,
+    },
   },
-  {
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-  }
+  { timestamps: true }
 );
+
+projectSchema.set("autoIndex", true);
+projectSchema.plugin(AutoIncrement, {
+  inc_field: "projectItemCounter",
+  disable_hooks: true,
+});
 
 projectSchema.virtual("membersCount").get(function () {
   return this.members.length;
@@ -34,12 +56,12 @@ projectSchema.virtual("membersCount").get(function () {
 
 projectSchema.methods.addMember = async function (userId) {
   const isMemberAlready = this.members.some((member) =>
-    member.user_id.equals(userId)
+    member.userId.equals(userId)
   );
   if (isMemberAlready) {
     throw new Error("Member already exists in the project");
   }
-  this.members.push({ user_id: userId, is_active: true });
+  this.members.push({ userId: userId, isActive: true });
   await this.save();
 };
 

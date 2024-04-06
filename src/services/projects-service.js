@@ -7,7 +7,7 @@ const getProjects = asyncHandler(async (req, res) => {
   try {
     const projects = await Project.find({ createdBy: req.user.id })
       .populate({
-        path: "members.user_id",
+        path: "members.userId",
         select: "firstname lastname email role",
       })
       .populate({
@@ -25,30 +25,49 @@ const getProjects = asyncHandler(async (req, res) => {
 const createProject = asyncHandler(async (req, res) => {
   const trimmedBody = trimAll(req.body);
   const {
-    project_name,
+    projectName,
     description,
-    start_date,
-    end_date,
+    status,
+    type,
+    tags = [],
+    services = [],
+    startDate,
+    endDate,
+    image,
     members = [],
   } = trimmedBody;
 
   try {
-    if (!project_name || !description || !start_date || !end_date) {
+    if (
+      !projectName ||
+      !description ||
+      !status ||
+      !type ||
+      !tags ||
+      !services ||
+      !startDate ||
+      !endDate
+    ) {
       throw new Error("Please provide all required project details.");
     }
 
-    const projectAvailable = await Project.findOne({ project_name });
+    const projectAvailable = await Project.findOne({ projectName });
     if (projectAvailable) {
       throw new Error("Project with that name already exists!");
     }
 
     const project = await Project.create({
-      project_name,
+      projectName,
       description,
-      start_date,
-      end_date,
+      status,
+      type,
+      tags,
+      services,
+      startDate,
+      endDate,
+      image,
       createdBy: req.user.id,
-      members: members.map((userId) => ({ user_id: userId, is_active: true })),
+      members: members.map((userId) => ({ userId: userId, isActive: true })),
     });
 
     res.status(201).json(project);
@@ -60,18 +79,18 @@ const createProject = asyncHandler(async (req, res) => {
 
 //*Add a member in Project, access private
 const addMemberToProject = asyncHandler(async (req, res) => {
-  const { user_id } = req.body;
-  const { project_id } = req.params;
+  const { userId } = req.body;
+  const { projectId } = req.params;
   try {
-    let project = await Project.findById(project_id);
+    let project = await Project.findById(projectId);
     if (!project) {
       res.status(404).json({ message: "Project not found" });
       return;
     }
 
-    await project.addMember(user_id);
-    project = await Project.findById(project_id).populate({
-      path: "members.user_id",
+    await project.addMember(userId);
+    project = await Project.findById(projectId).populate({
+      path: "members.userId",
       select: "firstname lastname email role",
     });
     res.status(200).json(project);
@@ -87,22 +106,38 @@ const addMemberToProject = asyncHandler(async (req, res) => {
 //*Update a Project, access private
 const updateProject = asyncHandler(async (req, res) => {
   const trimmedBody = trimAll(req.body);
-  const { project_name, description, start_date, end_date } = trimmedBody;
+  const {
+    id,
+    projectName,
+    description,
+    status,
+    type,
+    tags = [],
+    services = [],
+    startDate,
+    endDate,
+    image,
+  } = trimmedBody;
 
   try {
     const updatedProject = await Project.findByIdAndUpdate(
-      req.params.id,
+      id,
       {
-        project_name,
+        projectName,
         description,
-        start_date,
-        end_date,
+        status,
+        type,
+        tags,
+        services,
+        startDate,
+        endDate,
+        image,
       },
       {
         new: true,
       }
     ).populate({
-      path: "members.user_id",
+      path: "members.userId",
       select: "firstname lastname email role",
     });
 

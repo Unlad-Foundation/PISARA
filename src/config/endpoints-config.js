@@ -3,33 +3,49 @@ module.exports = {
     MAIN: {
       DEFAULT: "/",
     },
-    // user endpoints
-    USER_REGISTER: {
-      GET: "/users",
-      POST: "/users/register",
-      GET_UPDATE_DELETE_BY_ID: "/users/:id",
+
+    USER: {
+      REGISTER: {
+        GET: "/user/get/all",
+        GET_BY_ID: "/user/get/:id",
+        POST: "/user/create",
+        PUT: "/user/update",
+        DELETE: "/user/remove/:id",
+      },
+      LOGIN: {
+        GET: "/current/user",
+        POST: "/user/login",
+      },
     },
-    USER_LOGIN: {
-      GET: "/current",
-      POST: "/users/login",
-    },
-    // project endpoints
+
     PROJECT: {
-      GET: "/projects",
-      POST: "/projects",
-      GET_UPDATE_DELETE_BY_ID: "/projects/:id",
-      ADD_MEMBER: "/projects/:project_id/member",
+      GET: "/project/get/all",
+      GET_BY_ID: "/project/get/:id",
+      POST: "/project/create",
+      PUT: "/project/update",
+      DELETE: "/project/delete/:id",
     },
-    // project members endpoints
-    PROJECT_MEMBER: {
-      GET: "/:project_id",
-      DEACTIVATE: "/deactivate/:project_id/:user_id",
-      ACTIVATE: "/activate/:project_id/:user_id",
+
+    MEMBER: {
+      GET: "/member/get/all",
+      GET_BY_ID: "/member/:projectId",
+      POST: "/member/adduser",
+      PUT_DEACTIVATE: "/member/deactivate",
+      PUT_ACTIVATE: "/member/activate",
     },
-    // stage endpoints
-    STAGE: {
-      GET: "/get/stages",
-      POST: "/stages",
+
+    SPRINT: {},
+
+    ITEM: {
+      GET: "/item/get/all",
+      GET_BY_ID: "/item/get/:id",
+      POST: "/item/create",
+      PUT: "/item/update",
+      DELETE: "/item/remove/:id",
+      POST_SEARCH: "/item/search",
+      POST_COMMENT: "/item/:itemId/addcomment",
+      DELETE_COMMENT: "/item/:itemId/removecomment",
+      POST_IMAGE: "/item/:itemId/addimage",
     },
   },
 };
