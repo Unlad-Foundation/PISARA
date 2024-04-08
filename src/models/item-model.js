@@ -59,4 +59,6 @@ const itemSchema = new mongoose({
   children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Item" }],
 });
 
+itemSchema.set("autoIndex", true);
+
 module.exports = mongoose.model("Item", itemSchema);
