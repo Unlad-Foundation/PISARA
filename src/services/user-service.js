@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const User = require("../models/user-model");
+const userRepository = require("../repository/user-repository");
 const { trimAll } = require("../config/common-config");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
@@ -9,7 +9,7 @@ const saltFactor = 10;
 //*Get the user by id
 const getUser = asyncHandler(async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await userRepository.getUser(req.params.id);
     if (!user) {
       throw new Error("User not found");
     }
@@ -34,18 +34,18 @@ const registerUser = asyncHandler(async (req, res) => {
       throw new Error("Invalid email format");
     }
 
-    const userAvailable = await User.findOne({ email });
+    const userAvailable = await userRepository.findByEmail(email);
     if (userAvailable) {
       throw new Error("User already registered!");
     }
 
     const hashedPassword = await bcrypt.hash(password, saltFactor);
 
-    let user = await User.create({
+    const user = await userRepository.createUser({
       email,
       password: hashedPassword,
     });
-    user = await User.findById(user.id).select("-password");
+
     res.status(201).json(user);
   } catch (error) {
     res.status(400);
@@ -68,9 +68,7 @@ const updateUser = asyncHandler(async (req, res) => {
       updateData.email = email;
     }
 
-    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
-      new: true,
-    });
+    const updatedUser = await userRepository.updateUser(userId, updateData);
 
     if (!updatedUser) {
       res.status(400).json({ message: "User not found" });
@@ -92,11 +90,11 @@ const updateUser = asyncHandler(async (req, res) => {
 //*Delete the user, access public
 const deleteUser = asyncHandler(async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await userRepository.getUser(req.params.id);
     if (!user) {
       throw new Error("User not found");
     }
-    const deletedUser = await User.findByIdAndDelete(req.params.id);
+    const deletedUser = await userRepository.deleteUser(req.params.id);
     res.status(200).json({ message: "Delete successful", user: deletedUser });
   } catch (error) {
     res.status(400);
@@ -106,7 +104,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 //*Get users. For debugging only
 const getUsers = asyncHandler(async (req, res) => {
-  const users = await User.find({});
+  const users = await userRepository.getAllUsers();
   res.status(200).json(users);
 });
 
@@ -119,7 +117,7 @@ const loginUser = asyncHandler(async (req, res) => {
       throw new Error("Both email and password are required.");
     }
 
-    const user = await User.findOne({ email });
+    const user = await userRepository.findByEmail(email);
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new Error("Invalid credentials");
     }
@@ -151,12 +149,14 @@ const currentUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = {
-  registerUser,
-  getUser,
-  updateUser,
-  deleteUser,
-  getUsers,
-  loginUser,
-  currentUser,
+const userService = {
+  getUser: getUser,
+  registerUser: registerUser,
+  updateUser: updateUser,
+  deleteUser: deleteUser,
+  getUsers: getUsers,
+  loginUser: loginUser,
+  currentUser: currentUser,
 };
+
+module.exports = userService;

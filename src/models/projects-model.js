@@ -51,10 +51,6 @@ projectSchema.plugin(AutoIncrement, {
   disable_hooks: true,
 });
 
-projectSchema.virtual("membersCount").get(function () {
-  return this.members.length;
-});
-
 projectSchema.methods.addMember = async function (userId) {
   const isMemberAlready = this.members.some((member) =>
     member.userId.equals(userId)

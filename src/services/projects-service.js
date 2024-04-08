@@ -80,7 +80,7 @@ const createProject = asyncHandler(async (req, res) => {
 //*Add a member in Project, access private
 const addMemberToProject = asyncHandler(async (req, res) => {
   const { userId } = req.body;
-  const { projectId } = req.params;
+  const { projectId } = req.body;
   try {
     let project = await Project.findById(projectId);
     if (!project) {

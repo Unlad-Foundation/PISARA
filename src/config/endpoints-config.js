@@ -48,10 +48,10 @@ module.exports = {
       POST: "/item/create",
       PUT: "/item/update",
       DELETE: "/item/remove/:id",
-      POST_SEARCH: "/item/search",
-      POST_COMMENT: "/item/:itemId/addcomment",
+      SEARCH: "/item/search",
+      ADD_COMMENT: "/item/:itemId/addcomment",
       DELETE_COMMENT: "/item/:itemId/removecomment",
-      POST_IMAGE: "/item/:itemId/addimage",
+      ADD_IMAGE: "/item/:itemId/addimage",
     },
   },
 };
