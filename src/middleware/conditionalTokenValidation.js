@@ -3,6 +3,10 @@ const { API_ENDPOINTS } = require('../config/endpoints-config');
 
 const excludeFromTokenValidation = [
   {
+    path: API_ENDPOINTS.MAIN.DEFAULT,
+    method: 'GET',
+  },
+  {
     path: API_ENDPOINTS.USER.REGISTER.GET,
     method: 'GET',
   },
