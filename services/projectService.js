@@ -1,25 +1,26 @@
-const asyncHandler = require('express-async-handler');
-const Project = require('../models/projectModel');
+const projectRepository = require('../repository/projectRepository');
 const { trimAll } = require('../config/commonConfig');
 
-const getProjects = asyncHandler(async (req, res) => {
+const projectService = {
+  getProjects: getProjects,
+  createProject: createProject,
+  addMemberToProject: addMemberToProject,
+  updateProject: updateProject,
+  deleteProject: deleteProject,
+};
+
+module.exports = projectService;
+
+async function getProjects(req, res) {
   try {
-    const projects = await Project.find({ createdBy: req.user.id })
-      .populate({
-        path: 'members.userId',
-        select: 'firstname lastname email role',
-      })
-      .populate({
-        path: 'createdBy',
-        select: 'firstname lastname role',
-      });
+    const projects = await projectRepository.getProjects(req.user.id);
     res.status(200).json(projects);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-});
+}
 
-const createProject = asyncHandler(async (req, res) => {
+async function createProject(req, res) {
   const trimmedBody = trimAll(req.body);
   const {
     projectName,
@@ -48,12 +49,12 @@ const createProject = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: 'Please fill all fields' });
     }
 
-    const projectAvailable = await Project.findOne({ projectName });
+    const projectAvailable = await projectRepository.findOne(projectName);
     if (projectAvailable) {
       return res.status(400).json({ message: 'Project already exists' });
     }
 
-    const project = await Project.create({
+    const project = await projectRepository.createProject({
       projectName,
       description,
       status,
@@ -66,27 +67,23 @@ const createProject = asyncHandler(async (req, res) => {
       createdBy: req.user.id,
       members: members.map((userId) => ({ userId: userId, isActive: true })),
     });
-
     res.status(201).json(project);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-});
+}
 
-const addMemberToProject = asyncHandler(async (req, res) => {
+async function addMemberToProject(req, res) {
   const { userId } = req.body;
   const { projectId } = req.body;
   try {
-    let project = await Project.findById(projectId);
+    let project = await projectRepository.findById(projectId);
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
 
     await project.addMember(userId);
-    project = await Project.findById(projectId).populate({
-      path: 'members.userId',
-      select: 'firstname lastname email role',
-    });
+    project = await projectRepository.addMember(projectId);
     res.status(200).json(project);
   } catch (error) {
     if (error.message === 'Member already exists in the project') {
@@ -95,10 +92,9 @@ const addMemberToProject = asyncHandler(async (req, res) => {
       return res.status(500).json({ message: error.message });
     }
   }
-});
+}
 
-//*Update a Project, access private
-const updateProject = asyncHandler(async (req, res) => {
+async function updateProject(req, res) {
   const trimmedBody = trimAll(req.body);
   const {
     projectId,
@@ -127,25 +123,16 @@ const updateProject = asyncHandler(async (req, res) => {
       return res.status(400).json({ message: 'Please fill all fields' });
     }
 
-    const updatedProject = await Project.findByIdAndUpdate(
-      projectId,
-      {
-        projectName,
-        description,
-        status,
-        type,
-        tags,
-        services,
-        startDate,
-        endDate,
-        image,
-      },
-      {
-        new: true,
-      }
-    ).populate({
-      path: 'members.userId',
-      select: 'firstname lastname email role',
+    const updatedProject = await projectRepository.updateProject(projectId, {
+      projectName,
+      description,
+      status,
+      type,
+      tags,
+      services,
+      startDate,
+      endDate,
+      image,
     });
 
     if (!updatedProject) {
@@ -155,11 +142,11 @@ const updateProject = asyncHandler(async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-});
+}
 
-const deleteProject = asyncHandler(async (req, res) => {
+async function deleteProject(req, res) {
   try {
-    const deletedProject = await Project.findByIdAndDelete(req.params.id);
+    const deletedProject = await projectRepository.deleteProject(req.params.id);
     if (!deletedProject) {
       return res.status(404).json({ message: 'Project not found' });
     }
@@ -167,12 +154,4 @@ const deleteProject = asyncHandler(async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-});
-
-module.exports = {
-  getProjects,
-  createProject,
-  updateProject,
-  deleteProject,
-  addMemberToProject,
-};
+}

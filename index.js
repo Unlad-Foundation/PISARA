@@ -2,8 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const connectDb = require('./config/dbConnectionConfig.js');
+const { constants } = require('./config/constantsConfig.js');
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || constants.PORT;
 const app = express();
 
 app.use(cookieParser());

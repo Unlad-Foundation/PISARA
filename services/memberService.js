@@ -1,25 +1,29 @@
-const asyncHandler = require('express-async-handler');
-const Project = require('../models/projectModel');
+const memberRepository = require('../repository/memberRepository');
 
-const getProjectMembers = asyncHandler(async (req, res) => {
+const memberService = {
+  getProjectMembers: getProjectMembers,
+  deactivateMember: deactivateMember,
+  activateMember: activateMember,
+};
+
+module.exports = memberService;
+
+async function getProjectMembers(req, res) {
   const { projectId } = req.params;
   try {
-    const project = await Project.findById(projectId).populate({
-      path: 'members.userId',
-      select: 'firstname lastname email role',
-    });
+    const project = await memberRepository.getProjectMembers(projectId);
     if (!project) return res.status(404).json({ message: 'Project not found' });
 
     res.status(200).json(project.members);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-});
+}
 
-const deactivateMember = asyncHandler(async (req, res) => {
+async function deactivateMember(req, res) {
   const { projectId, userId } = req.body;
   try {
-    const project = await Project.findById(projectId);
+    const project = await memberRepository.findById(projectId);
     if (!project) return res.status(404).json({ message: 'Project not found' });
 
     const member = project.members.find((member) => member.userId.equals(userId));
@@ -31,12 +35,12 @@ const deactivateMember = asyncHandler(async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-});
+}
 
-const activateMember = asyncHandler(async (req, res) => {
+async function activateMember(req, res) {
   const { projectId, userId } = req.body;
   try {
-    const project = await Project.findById(projectId);
+    const project = await memberRepository.findById(projectId);
     if (!project) return res.status(404).json({ message: 'Project not found' });
 
     const member = project.members.find((member) => member.userId.equals(userId));
@@ -48,6 +52,4 @@ const activateMember = asyncHandler(async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-});
-
-module.exports = { deactivateMember, activateMember, getProjectMembers };
+}

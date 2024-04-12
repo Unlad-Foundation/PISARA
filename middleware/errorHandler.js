@@ -2,37 +2,37 @@ const { constants } = require('../config/constantsConfig');
 const errorHandler = (err, res) => {
   const statusCode = res.statusCode ? res.statusCode : 500;
   switch (statusCode) {
-    case constants.VALIDATION_ERROR:
+    case constants.STATUS.VALIDATION_ERROR.CODE:
       res.json({
-        title: 'Validation Failed',
+        title: constants.STATUS.VALIDATION_ERROR.TITLE,
         message: err.message,
         stackTrace: err.stack,
       });
       break;
-    case constants.NOT_FOUND:
+    case constants.STATUS.NOT_FOUND.CODE:
       res.json({
-        title: 'Not Found',
+        title: constants.STATUS.NOT_FOUND.TITLE,
         message: err.message,
         stackTrace: err.stack,
       });
       break;
-    case constants.UNAUTHORIZED:
+    case constants.STATUS.UNAUTHORIZED.CODE:
       res.json({
-        title: 'Unauthorized',
+        title: constants.STATUS.UNAUTHORIZED.TITLE,
         message: err.message,
         stackTrace: err.stack,
       });
       break;
-    case constants.FORBIDDEN:
+    case constants.STATUS.FORBIDDEN.CODE:
       res.json({
-        title: 'Forbidden',
+        title: constants.STATUS.FORBIDDEN.TITLE,
         message: err.message,
         stackTrace: err.stack,
       });
       break;
-    case constants.SERVER_ERROR:
+    case constants.STATUS.SERVER_ERROR.CODE:
       res.json({
-        title: 'Server Error',
+        title: constants.STATUS.SERVER_ERROR.TITLE,
         message: err.message,
         stackTrace: err.stack,
       });

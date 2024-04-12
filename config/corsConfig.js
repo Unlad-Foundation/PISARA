@@ -1,8 +1,8 @@
 const cors = require('cors');
-const { origin } = require('./constantsConfig');
+const { constants } = require('./constantsConfig');
 
 const corsOptions = {
-  origin: [origin.ORIGIN],
+  origin: [constants.ORIGIN.URL],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   credentials: true,
 };

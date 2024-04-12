@@ -1,4 +1,5 @@
 const userRepository = require('../repository/userRepository');
+const { constants } = require('../config/constantsConfig');
 const { trimAll } = require('../config/commonConfig');
 const bcrypt = require('bcrypt');
 const validator = require('validator');
@@ -142,8 +143,8 @@ async function loginUser(req, res) {
 
     const accessToken = jwt.sign(
       { user: { id: user.id, email: user.email, role: user.role } },
-      process.env.ACCESS_TOKEN_SECRET || 'P!$@r@S3cr3t',
-      { expiresIn: '1d' }
+      process.env.ACCESS_TOKEN_SECRET || constants.JWTCONFIG.SECRET,
+      { expiresIn: constants.JWTCONFIG.EXPIRESIN }
     );
 
     res.status(200).json({ accessToken });
