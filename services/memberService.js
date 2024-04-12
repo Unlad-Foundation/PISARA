@@ -1,7 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Project = require('../models/projectModel');
 
-//* Get project members, access private
 const getProjectMembers = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
   try {
@@ -13,12 +12,10 @@ const getProjectMembers = asyncHandler(async (req, res) => {
 
     res.status(200).json(project.members);
   } catch (error) {
-    res.status(404);
-    throw error;
+    return res.status(500).json({ message: error.message });
   }
 });
 
-//* Deactivate a member, access private
 const deactivateMember = asyncHandler(async (req, res) => {
   const { projectId, userId } = req.body;
   try {
@@ -32,12 +29,10 @@ const deactivateMember = asyncHandler(async (req, res) => {
     await project.save();
     res.status(200).json({ message: 'Member deactivated' });
   } catch (error) {
-    res.status(404);
-    throw error;
+    return res.status(500).json({ message: error.message });
   }
 });
 
-//* Activate a member, access private
 const activateMember = asyncHandler(async (req, res) => {
   const { projectId, userId } = req.body;
   try {
@@ -51,8 +46,7 @@ const activateMember = asyncHandler(async (req, res) => {
     await project.save();
     res.status(200).json({ message: 'Member activated' });
   } catch (error) {
-    res.status(404);
-    throw error;
+    return res.status(500).json({ message: error.message });
   }
 });
 
