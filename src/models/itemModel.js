@@ -1,14 +1,14 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const itemSchema = new mongoose({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: 'User',
     required: true,
   },
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Project",
+    ref: 'Project',
     required: true,
   },
   title: {
@@ -16,20 +16,20 @@ const itemSchema = new mongoose({
     required: true,
   },
   description: String,
-  assignees: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  start_date: Date,
-  end_date: Date,
+  assignees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  startDate: Date,
+  endDate: Date,
   status: {
     type: String,
-    default: "open",
+    default: 'open',
   },
   priority: {
     type: String,
-    default: "normal",
+    default: 'normal',
   },
   type: {
     type: String,
-    default: "task",
+    default: 'task',
   },
   tags: [String],
   attachments: {
@@ -44,7 +44,7 @@ const itemSchema = new mongoose({
   },
   comments: [
     {
-      user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
       message: String,
       createdAt: {
         type: Date,
@@ -56,9 +56,9 @@ const itemSchema = new mongoose({
       },
     },
   ],
-  children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Item" }],
+  children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }],
 });
 
-itemSchema.set("autoIndex", true);
+itemSchema.set('autoIndex', true);
 
-module.exports = mongoose.model("Item", itemSchema);
+module.exports = mongoose.model('Item', itemSchema);
