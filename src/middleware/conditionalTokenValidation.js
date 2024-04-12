@@ -1,5 +1,5 @@
-const tokenValidation = require('./validate-token-handler');
-const { API_ENDPOINTS } = require('../config/endpoints-config');
+const tokenValidationHandler = require('./validateTokenHandler');
+const { API_ENDPOINTS } = require('../config/endpointsConfig');
 
 const excludeFromTokenValidation = [
   {
@@ -7,29 +7,27 @@ const excludeFromTokenValidation = [
     method: 'GET',
   },
   {
-    path: API_ENDPOINTS.USER.REGISTER.GET,
+    path: API_ENDPOINTS.USER.GET,
     method: 'GET',
   },
   {
-    path: API_ENDPOINTS.USER.REGISTER.POST,
+    path: API_ENDPOINTS.USER.POST,
     method: 'POST',
   },
   {
-    path: API_ENDPOINTS.USER.LOGIN.POST,
+    path: API_ENDPOINTS.USER.LOGIN,
     method: 'POST',
   },
 ];
 
 const conditionalTokenValidation = (req, res, next) => {
   const isExcluded = excludeFromTokenValidation.some(
-    (endpoint) => endpoint.path === req.path && endpoint.method === req.method
+    (exclusion) => req.path.endsWith(exclusion.path) && req.method === exclusion.method
   );
-
   if (isExcluded) {
     return next();
   }
-
-  return tokenValidation(req, res, next);
+  tokenValidationHandler(req, res, next);
 };
 
 module.exports = conditionalTokenValidation;

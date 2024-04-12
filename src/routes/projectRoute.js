@@ -6,13 +6,13 @@ const {
   updateProject,
   deleteProject,
   addMemberToProject,
-} = require('../services/projects-service');
-const { API_ENDPOINTS } = require('../config/endpoints-config');
+} = require('../services/projectService');
+const { API_ENDPOINTS } = require('../config/endpointsConfig');
 
-router.route(API_ENDPOINTS.PROJECT.GET_BY_ID).get(getProjects);
+router.route(API_ENDPOINTS.PROJECT.GET).get(getProjects);
 router.route(API_ENDPOINTS.PROJECT.POST).post(createProject);
 router.route(API_ENDPOINTS.PROJECT.PUT).put(updateProject);
 router.route(API_ENDPOINTS.PROJECT.DELETE).delete(deleteProject);
-router.route(API_ENDPOINTS.MEMBER).post(addMemberToProject);
+router.route(API_ENDPOINTS.MEMBER.POST).post(addMemberToProject);
 
 module.exports = router;

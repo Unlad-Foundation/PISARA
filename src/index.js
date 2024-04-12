@@ -1,31 +1,33 @@
 require('dotenv').config();
 const express = require('express');
 const cookieParser = require('cookie-parser');
-const connectDb = require('./config/db-connection-config.js');
-const { API_ENDPOINTS } = require('./config/endpoints-config.js');
-const { MSG } = require('../src/config/common-config.js');
+const connectDb = require('./config/dbConnectionConfig.js');
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 5000;
 const app = express();
 
-connectDb();
+connectDb()
+  .then(() => {
+    app.use(cookieParser());
+    app.use(express.urlencoded({ extended: true }));
+    app.use(express.json());
 
-app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+    app.use(require('./config/corsConfig.js'));
+    app.use(require('./config/sessionConfig.js'));
 
-app.use(require('./config/cors-config.js'));
-app.use(require('./config/session-config.js'));
+    app.use(require('./middleware/conditionalTokenValidation.js'));
 
-app.use(require('./middleware/conditionalTokenValidation.js'));
+    app.use(require('./routes/mainRoute.js'));
+    app.use('/api', require('./routes/userRoute.js'));
+    app.use('/api', require('./routes/projectRoute.js'));
+    app.use('/api', require('./routes/memberRoute.js'));
 
-app.get(API_ENDPOINTS.MAIN.DEFAULT, (req, res) => res.send(MSG.WELCOME));
-app.use('/api', require('./routes/user-route.js'));
-app.use('/api', require('./routes/projects-route.js'));
-app.use('/api', require('./routes/member-route.js'));
+    app.use(require('./middleware/errorHandler.js'));
 
-app.use(require('./middleware/error-handler.js'));
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('Database connection failed:', error);
+  });

@@ -7,5 +7,6 @@ exports.constants = {
 };
 
 exports.origin = {
-  ORIGIN: "http://localhost:5173",
-}
+  // adjust this to your frontend URL
+  ORIGIN: 'http://localhost:5173',
+};
