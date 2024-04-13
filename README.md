@@ -5,7 +5,7 @@ Welcome to the UNLAD Template Service API documentation
 ## Setup
 
 1.  Clone the repository
-    `git clone https://github.com/Unlad-Foundation/unlad-template-service`
+    `git clone https://github.com/Unlad-Foundation/unlad-template-service.git`
 2.  Install dependencies
     `npm install`
 3.  Run local server
