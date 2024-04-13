@@ -1,7 +1,8 @@
 const session = require('express-session');
+const { constants } = require('./constantsConfig');
 
 const sessionConfig = {
-  secret: process.env.SESSION_SECRET || 'P!$@r@S3cr3t',
+  secret: process.env.SESSION_SECRET || constants.JWTCONFIG.SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
