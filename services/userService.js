@@ -22,7 +22,7 @@ async function getUser(req, res) {
   try {
     const user = await userRepository.getUser(req.params.id);
     if (!user) {
-      return res.status(400).json({ message: 'User not found' });
+      return res.status(400).json({ message: constants.ERROR.USER.NOT_FOUND });
     }
     res.status(200).json({ user });
   } catch (error) {
@@ -35,16 +35,16 @@ async function registerUser(req, res) {
   try {
     const { email, password } = trimmedBody;
     if (!email || !password) {
-      return res.status(400).json({ message: 'Both email and password are required.' });
+      return res.status(400).json({ message: constants.ERROR.USER.REQUIRED_FIELDS });
     }
 
     if (!validator.isEmail(email)) {
-      return res.status(400).json({ message: 'Invalid email format' });
+      return res.status(400).json({ message: constants.ERROR.USER.INVALID_EMAIL });
     }
 
     const userAvailable = await userRepository.findByEmail(email);
     if (userAvailable) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: constants.ERROR.USER.ALREADY_EXIST });
     }
 
     const hashedPassword = await bcrypt.hash(password, saltFactor);
@@ -54,7 +54,7 @@ async function registerUser(req, res) {
       password: hashedPassword,
     });
 
-    res.status(201).json(user);
+    res.status(201).json({ message: constants.SUCCESS.USER.REGISTER, user });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -66,7 +66,7 @@ async function updateUser(req, res) {
     const { email, password, ...otherUpdates } = trimmedBody;
 
     if (email && !validator.isEmail(email)) {
-      return res.status(400).json({ message: 'Invalid email format' });
+      return res.status(400).json({ message: constants.ERROR.USER.INVALID_EMAIL });
     }
 
     let updates = { ...otherUpdates };
@@ -80,19 +80,19 @@ async function updateUser(req, res) {
     const updatedUser = await userRepository.updateUser(req.user.id, updates);
 
     if (!updatedUser) {
-      return res.status(400).json({ message: 'User not found' });
+      return res.status(400).json({ message: constants.ERROR.USER.NOT_FOUND });
     }
 
     const { password: _, ...userWithoutPassword } = updatedUser.toObject();
 
-    res.status(200).json({ message: 'Update successful', user: userWithoutPassword });
+    res.status(200).json({ message: constants.SUCCESS.USER.UPDATE, user: userWithoutPassword });
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(400).json({ message: 'Email already exists' });
+      return res.status(400).json({ message: constants.ERROR.USER.EMAIL_ALREADY_EXISTS });
     } else {
       return res
         .status(500)
-        .json({ message: 'An error occurred during the update.', error: error.message });
+        .json({ message: constants.ERROR.USER.UPDATE_FAILED, error: error.message });
     }
   }
 }
@@ -101,10 +101,10 @@ async function deleteUser(req, res) {
   try {
     const user = await userRepository.getUser(req.params.id);
     if (!user) {
-      return res.status(400).json({ message: 'User not found' });
+      return res.status(400).json({ message: constants.ERROR.USER.NOT_FOUND });
     }
     const deletedUser = await userRepository.deleteUser(req.params.id);
-    res.status(200).json({ message: 'Delete successful', user: deletedUser });
+    res.status(200).json({ message: constants.SUCCESS.USER.DELETE, user: deletedUser });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -124,21 +124,19 @@ async function loginUser(req, res) {
   try {
     const { email, password } = trimmedBody;
     if (!email || !password) {
-      return res.status(400).json({ message: 'Both email and password are required.' });
+      return res.status(400).json({ message: constants.ERROR.USER.REQUIRED_FIELDS });
     }
 
     if (email && !validator.isEmail(email)) {
-      return res.status(400).json({ message: 'Invalid email format' });
+      return res.status(400).json({ message: constants.ERROR.USER.INVALID_EMAIL });
     }
 
     const user = await userRepository.findByEmail(email);
     if (!user) {
-      return res
-        .status(400)
-        .json({ message: 'No account found with this email. Please register.' });
+      return res.status(400).json({ message: constants.ERROR.USER.NO_ACCOUNT });
     }
     if (!(await bcrypt.compare(password, user.password))) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: constants.ERROR.USER.INVALID_CREDENTIALS });
     }
 
     const accessToken = jwt.sign(
@@ -147,7 +145,7 @@ async function loginUser(req, res) {
       { expiresIn: constants.JWTCONFIG.EXPIRESIN }
     );
 
-    res.status(200).json({ accessToken });
+    res.status(200).json({ message: constants.SUCCESS.USER.LOGIN, accessToken });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -157,7 +155,7 @@ async function currentUser(req, res) {
   try {
     if (!req.user) {
       res.status(401);
-      res.status(401).json({ message: 'Unauthorized' });
+      res.status(401).json({ message: constants.ERROR.USER.NOT_AUTHORIZED });
     }
     res.status(200).json({ user: req.user });
   } catch (error) {

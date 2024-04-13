@@ -38,10 +38,9 @@ const errorHandler = (err, res) => {
       });
       break;
     default:
-      console.error('Unexpected error:', err);
       res.status(500).json({
-        title: 'Unexpected Error',
-        message: 'An unexpected error occurred. Please try again later.',
+        message: constants.ERROR.UNEXPECTED,
+        error: err.message,
       });
       break;
   }

@@ -26,9 +26,9 @@ app.use(require('./middleware/errorHandler.js'));
 connectDb()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`${constants.SUCCESS.SERVER} ${PORT}`);
     });
   })
   .catch((error) => {
-    console.error('Database connection failed:', error);
+    console.error(`${constants.ERROR.CONNECTION_FAILED}`, error);
   });

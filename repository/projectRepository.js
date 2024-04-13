@@ -1,4 +1,5 @@
 const Project = require('../models/projectModel');
+const { constants } = require('../config/constantsConfig');
 
 const projectRepository = {
   getProjects: getProjects,
@@ -16,12 +17,12 @@ async function getProjects(id) {
   try {
     return await Project.find({ createdBy: id })
       .populate({
-        path: 'members.userId',
-        select: 'firstname lastname email role',
+        path: constants.POPULATE.PROJECT.PATH,
+        select: constants.POPULATE.PROJECT.SELECT,
       })
       .populate({
-        path: 'createdBy',
-        select: 'firstname lastname role',
+        path: constants.POPULATE.USER.PATH,
+        select: constants.POPULATE.USER.SELECT,
       })
       .lean()
       .exec();
@@ -58,8 +59,8 @@ async function addMember(id) {
   try {
     return await Project.findById(id)
       .populate({
-        path: 'members.userId',
-        select: 'firstname lastname email role',
+        path: constants.POPULATE.PROJECT.PATH,
+        select: constants.POPULATE.PROJECT.SELECT,
       })
       .lean()
       .exec();
@@ -72,8 +73,8 @@ async function updateProject(id, params) {
   try {
     return await Project.findByIdAndUpdate(id, params, { new: true })
       .populate({
-        path: 'members.userId',
-        select: 'firstname lastname email role',
+        path: constants.POPULATE.PROJECT.PATH,
+        select: constants.POPULATE.PROJECT.SELECT,
       })
       .lean()
       .exec();

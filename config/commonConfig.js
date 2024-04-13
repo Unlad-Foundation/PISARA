@@ -1,3 +1,5 @@
+const { contants, constants } = require('./constantsConfig');
+
 function trimAll(obj) {
   const trimmedObj = {};
   for (const key in obj) {
@@ -7,7 +9,7 @@ function trimAll(obj) {
 }
 
 const MSG = {
-  WELCOME: "You're successfully connected to Template API.",
+  WELCOME: `You're successfully connected to ${constants.APP.NAME}.`,
 };
 
 module.exports = { trimAll, MSG };

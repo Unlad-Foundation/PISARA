@@ -1,4 +1,5 @@
 const Project = require('../models/projectModel');
+const { constants } = require('../config/constantsConfig');
 
 const memberRepository = {
   getProjectMembers: getProjectMembers,
@@ -11,8 +12,8 @@ async function getProjectMembers(id) {
   try {
     return await Project.findById(id)
       .populate({
-        path: 'members.userId',
-        select: 'firstname lastname email role',
+        path: constants.POPULATE.PROJECT.PATH,
+        select: constants.POPULATE.PROJECT.SELECT,
       })
       .lean()
       .exec();

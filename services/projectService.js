@@ -1,5 +1,6 @@
 const projectRepository = require('../repository/projectRepository');
 const { trimAll } = require('../config/commonConfig');
+const { constants } = require('../config/constantsConfig');
 
 const projectService = {
   getProjects: getProjects,
@@ -36,22 +37,13 @@ async function createProject(req, res) {
   } = trimmedBody;
 
   try {
-    if (
-      !projectName ||
-      !description ||
-      !status ||
-      !type ||
-      !tags ||
-      !services ||
-      !startDate ||
-      !endDate
-    ) {
-      return res.status(400).json({ message: 'Please fill all fields' });
+    if (!projectName || !description || !services || !startDate) {
+      return res.status(400).json({ message: constants.ERROR.PROJECT.REQUIRED_FIELDS });
     }
 
     const projectAvailable = await projectRepository.findOne(projectName);
     if (projectAvailable) {
-      return res.status(400).json({ message: 'Project already exists' });
+      return res.status(400).json({ message: constants.ERROR.PROJECT.ALREADY_EXISTS });
     }
 
     const project = await projectRepository.createProject({
@@ -67,7 +59,7 @@ async function createProject(req, res) {
       createdBy: req.user.id,
       members: members.map((userId) => ({ userId: userId, isActive: true })),
     });
-    res.status(201).json(project);
+    res.status(201).json({ message: constants.SUCCESS.PROJECT.CREATE, project });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -79,14 +71,14 @@ async function addMemberToProject(req, res) {
   try {
     let project = await projectRepository.findById(projectId);
     if (!project) {
-      return res.status(404).json({ message: 'Project not found' });
+      return res.status(404).json({ message: constants.ERROR.PROJECT.NOT_FOUND });
     }
 
     await project.addMember(userId);
     project = await projectRepository.addMember(projectId);
     res.status(200).json(project);
   } catch (error) {
-    if (error.message === 'Member already exists in the project') {
+    if (error.message === constants.ERROR.PROJECT.MEMBER_EXISTS) {
       return res.status(400).json({ message: error.message });
     } else {
       return res.status(500).json({ message: error.message });
@@ -110,17 +102,8 @@ async function updateProject(req, res) {
   } = trimmedBody;
 
   try {
-    if (
-      !projectName ||
-      !description ||
-      !status ||
-      !type ||
-      !tags ||
-      !services ||
-      !startDate ||
-      !endDate
-    ) {
-      return res.status(400).json({ message: 'Please fill all fields' });
+    if (!projectName || !description || !services || !startDate) {
+      return res.status(400).json({ message: constants.ERROR.PROJECT.REQUIRED_FIELDS });
     }
 
     const updatedProject = await projectRepository.updateProject(projectId, {
@@ -136,9 +119,9 @@ async function updateProject(req, res) {
     });
 
     if (!updatedProject) {
-      return res.status(404).json({ message: 'Project not found' });
+      return res.status(404).json({ message: constants.ERROR.PROJECT.NOT_FOUND });
     }
-    res.status(200).json(updatedProject);
+    res.status(200).json({ message: constants.SUCCESS.PROJECT.UPDATE, updatedProject });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -148,9 +131,9 @@ async function deleteProject(req, res) {
   try {
     const deletedProject = await projectRepository.deleteProject(req.params.id);
     if (!deletedProject) {
-      return res.status(404).json({ message: 'Project not found' });
+      return res.status(404).json({ message: constants.ERROR.PROJECT.NOT_FOUND });
     }
-    res.status(200).json({ message: 'Project deleted successfully' });
+    res.status(200).json({ message: constants.SUCCESS.PROJECT.DELETE });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
