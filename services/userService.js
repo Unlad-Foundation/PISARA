@@ -139,10 +139,11 @@ async function loginUser(req, res) {
       return res.status(400).json({ message: constants.ERROR.USER.INVALID_CREDENTIALS });
     }
 
+    let expiration = user.type == 'user' ? constants.JWTCONFIG.EXPIRESIN : 0;
     const accessToken = jwt.sign(
       { user: { id: user.id, email: user.email, role: user.role } },
       process.env.ACCESS_TOKEN_SECRET || constants.JWTCONFIG.SECRET,
-      { expiresIn: constants.JWTCONFIG.EXPIRESIN }
+      { expiresIn: expiration }
     );
 
     res.status(200).json({ message: constants.SUCCESS.USER.LOGIN, accessToken });

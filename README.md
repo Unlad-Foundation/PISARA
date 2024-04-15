@@ -50,3 +50,38 @@ The response body from the API should return your access token. Update your work
 ## REST Calls Example
 
 Visit the documentation - https://documenter.getpostman.com/view/30947035/2sA3Bhfv5k
+
+## Software Configuration Management (SCM)
+
+**"One Feature, One Branch"**
+We use GitFlow Workflow [(read me)](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) as our branching strategy where we create new branches for every feature we develop. As such, we create `hotfix` and `release` branches as needed using the same concept.
+
+e.g. You will add a feature called "Advance Analytics"
+
+1.  Create a branch from the `develop-branch` and name it `advance-analytics-feature` and checkout this branch
+2.  Make your changes to your newly created branch and perform all tests (local server and Sandbox/Dev environment) before doing a commit and push for all your changes
+3.  Create a "Pull Request" to the `develop-branch` and add all the leads as reviewers. Once the PR is approved and merged, the `develop-branch` can be deployed to the "Test" environment
+
+## Best Practices
+
+- Use **Assistive Coding** to validate codes and review to make sure
+  our codes are optimized and error free before pushing the codes to our git repository.
+
+  - [OpenAI ChatGPT](https://chat.openai.com/)
+  - [Google Gemini](https://makersuite.google.com/app/prompts/new_freeform)
+  - [Groq Mixtral](https://groq.com/)
+
+- Use different environments to isolate testing and deployment.
+  - **Dev/Sandbox** (required for Developer and Isolated Testing)
+  - **Test/Staging environment** (required for E2E and Client Testing)
+  - **QC environment** (optional for Internal Testing, a production clone)
+  - **UAT Environment** (optional for Isolated Client Testing, , a production clone)
+  - **Production** (required)
+
+## Online References and Guides
+
+- [GitHub Desktop Doc](https://docs.github.com/en/desktop/overview/about-github-desktop)
+- [REST Calls using POSTMAN](https://documenter.getpostman.com/view/30947035/2sA3Bhfv5k/)
+- [How to Create a Express/Node + React Project | Node Backend + React Frontend](https://www.youtube.com/watch?v=w3vs4a03y3I&list=PLwCOqpI4WKFx_f-Fg3CHwF7n0080x-Yme&index=5&t=225s)
+- [Creating High-Quality React Components: Best Practices for Reusability](https://www.youtube.com/watch?v=eXRlVpw1SIQ&t=548s)
+- [Best ChatGPT prompts for coding](https://www.learnprompt.org/chat-gpt-prompts-for-coding/)
