@@ -60,6 +60,7 @@ exports.constants = {
       REQUIRED_FIELDS: 'Both email and password are required.',
       ALREADY_EXIST: 'User already exists',
       UPDATE_FAILED: 'An error occurred during the update.',
+      INVALID_ID: 'Invalid user ID',
     },
 
     PROJECT: {
@@ -96,6 +97,7 @@ exports.constants = {
     USER: {
       EMAIL: 'email',
       PASSWORD: 'password',
+      ID: 'id',
     },
   },
 
