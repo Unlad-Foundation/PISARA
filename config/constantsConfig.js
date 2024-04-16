@@ -40,7 +40,8 @@ exports.constants = {
   JWTCONFIG: {
     // adjust this to your secret key and expiration time
     SECRET: 'P!$@r@S3cr3t',
-    EXPIRESIN: '1d',
+    ADMIN_EXPIRESIN: '1d',
+    EXPIRESIN: '1h',
     BEARER_REGEX: /^Bearer\s+(\S+)/,
   },
 
@@ -88,6 +89,13 @@ exports.constants = {
       DELETE: 'Delete successful',
       DEACTIVATE: 'Member deactivated',
       ACTIVATE: 'Member activated',
+    },
+  },
+
+  VALIDATION: {
+    USER: {
+      EMAIL: 'email',
+      PASSWORD: 'password',
     },
   },
 

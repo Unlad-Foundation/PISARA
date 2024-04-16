@@ -2,7 +2,6 @@ const userRepository = require('../repository/userRepository');
 const { constants } = require('../config/constantsConfig');
 const { trimAll } = require('../config/commonConfig');
 const bcrypt = require('bcrypt');
-const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const saltFactor = 10;
 
@@ -34,13 +33,6 @@ async function registerUser(req, res) {
   const trimmedBody = trimAll(req.body);
   try {
     const { email, password } = trimmedBody;
-    if (!email || !password) {
-      return res.status(400).json({ message: constants.ERROR.USER.REQUIRED_FIELDS });
-    }
-
-    if (!validator.isEmail(email)) {
-      return res.status(400).json({ message: constants.ERROR.USER.INVALID_EMAIL });
-    }
 
     const userAvailable = await userRepository.findByEmail(email);
     if (userAvailable) {
@@ -64,10 +56,6 @@ async function updateUser(req, res) {
   const trimmedBody = trimAll(req.body);
   try {
     const { email, password, ...otherUpdates } = trimmedBody;
-
-    if (email && !validator.isEmail(email)) {
-      return res.status(400).json({ message: constants.ERROR.USER.INVALID_EMAIL });
-    }
 
     let updates = { ...otherUpdates };
     if (password) {
@@ -123,13 +111,6 @@ async function loginUser(req, res) {
   const trimmedBody = trimAll(req.body);
   try {
     const { email, password } = trimmedBody;
-    if (!email || !password) {
-      return res.status(400).json({ message: constants.ERROR.USER.REQUIRED_FIELDS });
-    }
-
-    if (email && !validator.isEmail(email)) {
-      return res.status(400).json({ message: constants.ERROR.USER.INVALID_EMAIL });
-    }
 
     const user = await userRepository.findByEmail(email);
     if (!user) {
@@ -139,7 +120,8 @@ async function loginUser(req, res) {
       return res.status(400).json({ message: constants.ERROR.USER.INVALID_CREDENTIALS });
     }
 
-    let expiration = user.type == 'user' ? constants.JWTCONFIG.EXPIRESIN : 0;
+    let expiration =
+      user.type == 'user' ? constants.JWTCONFIG.ADMIN_EXPIRESIN : constants.JWTCONFIG.EXPIRESIN;
     const accessToken = jwt.sign(
       { user: { id: user.id, email: user.email, role: user.role } },
       process.env.ACCESS_TOKEN_SECRET || constants.JWTCONFIG.SECRET,
