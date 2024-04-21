@@ -70,6 +70,8 @@ exports.constants = {
       REQUIRED_FIELDS: 'Please fill all fields',
       MEMBER_EXISTS: 'Member already exists in the project',
       MEMBER_NOT_FOUND: 'Member not found in the project',
+      INVALID_ID: 'Invalid project ID',
+      INVALID_USER_ID: 'Invalid user ID',
     },
   },
 
@@ -98,6 +100,18 @@ exports.constants = {
       EMAIL: 'email',
       PASSWORD: 'password',
       ID: 'id',
+    },
+
+    PROJECT: {
+      PROJECT_NAME: 'projectName',
+      DESCRIPTION: 'description',
+      ID: 'id',
+      ADD_MEMBER: 'userId',
+      PROJECT_ID: 'projectId',
+
+      PARAM: {
+        PROJECT_ID: 'projectId',
+      },
     },
   },
 

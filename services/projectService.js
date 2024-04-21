@@ -37,10 +37,6 @@ async function createProject(req, res) {
   } = trimmedBody;
 
   try {
-    if (!projectName || !description || !services || !startDate) {
-      return res.status(400).json({ message: constants.ERROR.PROJECT.REQUIRED_FIELDS });
-    }
-
     const projectAvailable = await projectRepository.findOne(projectName);
     if (projectAvailable) {
       return res.status(400).json({ message: constants.ERROR.PROJECT.ALREADY_EXISTS });
@@ -74,15 +70,20 @@ async function addMemberToProject(req, res) {
       return res.status(404).json({ message: constants.ERROR.PROJECT.NOT_FOUND });
     }
 
-    await project.addMember(userId);
-    project = await projectRepository.addMember(projectId);
-    res.status(200).json(project);
-  } catch (error) {
-    if (error.message === constants.ERROR.PROJECT.MEMBER_EXISTS) {
-      return res.status(400).json({ message: error.message });
-    } else {
-      return res.status(500).json({ message: error.message });
+    const isMemberAlready = project.members.some((member) => member.userId.equals(userId));
+    if (isMemberAlready) {
+      return res.status(400).json({ message: constants.ERROR.PROJECT.MEMBER_EXISTS });
     }
+
+    project.members.push({ userId: userId, isActive: true });
+
+    const updatedProject = await projectRepository.updateProject(projectId, {
+      members: project.members,
+    });
+
+    res.status(200).json(updatedProject);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 }
 
@@ -102,10 +103,6 @@ async function updateProject(req, res) {
   } = trimmedBody;
 
   try {
-    if (!projectName || !description || !services || !startDate) {
-      return res.status(400).json({ message: constants.ERROR.PROJECT.REQUIRED_FIELDS });
-    }
-
     const updatedProject = await projectRepository.updateProject(projectId, {
       projectName,
       description,
@@ -121,7 +118,8 @@ async function updateProject(req, res) {
     if (!updatedProject) {
       return res.status(404).json({ message: constants.ERROR.PROJECT.NOT_FOUND });
     }
-    res.status(200).json({ message: constants.SUCCESS.PROJECT.UPDATE, updatedProject });
+
+    res.status(200).json({ updatedProject });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
